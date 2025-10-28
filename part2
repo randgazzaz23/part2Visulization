@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@6.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7.0.2"></script>
+  <style>
+    body {
+      margin: 30px;
+      font-family: Arial, sans-serif;
+    }
+    /* Flex layout for side-by-side charts */
+    .chart-row {
+      display: flex;
+      gap: 20px; /* space between charts */
+      align-items: flex-start;
+    }
+    /* Each chart container */
+    .chart-box {
+      padding-right: 20px;
+    }
+    /* Add a vertical line separator on right side except last one */
+    .chart-box:not(:last-child) {
+      border-right: 3px solid #ccc;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Traffic Accident Visualizations</h2>
+
+  <div class="chart-row">
+    <div id="chart1" class="chart-box"></div>
+    <div id="chart2" class="chart-box"></div>
+    <div id="chart3" class="chart-box"></div>
+  </div>
+
+  <script>
+    // === Chart 1: Bar Chart ===
+    const chart1 = {
+      "data": {
+        "url": "https://raw.githubusercontent.com/sheriefAbdallah/CS318/refs/heads/main/Traffic_Incidents.csv",
+        "format": {"type": "csv", "parse": {"acci_time": "date:'%d/%m/%Y %H:%M:%S'"}}
+      },
+      "width": 400,
+      "height": 400,
+      "title": "Total Number of Accidents Across Days of the Week",
+      "mark": {"type": "bar", "width": {"band": 0.6}},
+      "encoding": {
+        "x": {
+          "timeUnit": "day",
+          "field": "acci_time",
+          "type": "nominal",
+          "sort": ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+          "title": "Day of the Week"
+        },
+        "y": {"aggregate": "count", "field": "acci_id", "type": "quantitative", "title": "Number of Accidents"},
+        "color": {"timeUnit": "day", "field": "acci_time", "type": "nominal"},
+        "tooltip": [
+          {"timeUnit": "day", "field": "acci_time", "type": "nominal", "title": "Day"},
+          {"aggregate": "count", "field": "acci_id", "type": "quantitative", "title": "Accidents"}
+        ]
+      }
+    };
+
+    // === Chart 2: Line Chart ===
+    const chart2 = {
+      "data": {
+        "url": "https://raw.githubusercontent.com/sheriefAbdallah/CS318/refs/heads/main/Traffic_Incidents.csv",
+        "format": {"type": "csv", "parse": {"acci_time": "date:'%d/%m/%Y %H:%M:%S'"}}
+      },
+      "transform": [
+        {"calculate": "hours(datum.acci_time)", "as": "hour"},
+        {"calculate": "timeFormat(datum.acci_time, '%A')", "as": "day_of_the_week"}
+      ],
+      "width": 400,
+      "height": 400,
+      "title": "Traffic Accidents by the Time of Day and Weekdays",
+      "mark": {"type": "line", "point": {"filled": true, "size": 70}},
+      "encoding": {
+        "x": {
+          "field": "hour",
+          "type": "ordinal",
+          "title": "Hour of the Day (0-23)",
+          "axis": {"values": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23
+            ],"labelAngle": 0}
+        },
+        "y": {"aggregate": "count", "type": "quantitative", "title": "Number of Accidents"},
+        "color": {
+          "field": "day_of_the_week",
+          "type": "nominal",
+          "title": "Days of the Week",
+          "sort": ["Monday",
+					"Tuesday",
+					"Wednesday",
+					"Thursday",
+					"Friday",
+					"Saturday",
+					"Sunday"]
+        },
+        "tooltip": [
+          {"field": "hour", "type": "quantitative", "title": "Hour"},
+          {"field": "day_of_the_week", "type": "nominal", "title": "Day"},
+          {"aggregate": "count", "type": "quantitative", "title": "Accidents"}
+        ]
+      }
+    };
+
+    // === Chart 3: Dubai Accident Map ===
+    const chart3 = {
+      "data": {
+        "url": "https://raw.githubusercontent.com/sheriefAbdallah/CS318/refs/heads/main/Traffic_Incidents.csv",
+        "format": {"type": "csv", "parse": {"acci_time": "date:'%d/%m/%Y %H:%M:%S'"}}
+      },
+      "title": "Accident Density Map Across Dubai",
+      "width": 400,
+      "height": 400,
+      "projection": {"type": "mercator"},
+      "layer": [
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/janab957/dubai-geojson/refs/heads/main/Dubai.geojson",
+            "format": {"type": "json"}
+          },
+          "mark": {"type": "geoshape", "fill": "#f4f4f4", "stroke": "#e4e4e4"}
+        },
+        {
+          "transform": [
+            {"filter": "datum.acci_y > 23"},
+            {"calculate": "round(datum.acci_x * 300) / 300", "as": "lat"},
+            {"calculate": "round(datum.acci_y * 300) / 300", "as": "lon"},
+            {"aggregate": [{"op": "count", "as": "total"}], "groupby": ["lat", "lon"]}
+          ],
+          "mark": {"type": "circle", "opacity": 0.4},
+          "encoding": {
+            "latitude": {"field": "lat", "type": "quantitative"},
+            "longitude": {"field": "lon", "type": "quantitative"},
+            "size": {"value": 12},
+            "color": {
+              "field": "total",
+              "type": "quantitative",
+              "title": "Accident Density",
+              "scale": {
+                "type": "sqrt",
+                "range": ["#ffdb99",
+						"#ff6600",
+						"#cc0000",
+						"#660000",
+						"#0d0000"]
+              }
+            },
+            "tooltip": [
+              {"field": "lat", "title": "Lat"},
+              {"field": "lon", "title": "Lon"},
+              {"field": "total", "title": "Accidents"}
+            ]
+          }
+        }
+      ]
+    };
+
+    // Embed all three charts
+    vegaEmbed("#chart1", chart1);
+    vegaEmbed("#chart2", chart2);
+    vegaEmbed("#chart3", chart3);
+  </script>
+</body>
+</html>
+
+
+
+
+
