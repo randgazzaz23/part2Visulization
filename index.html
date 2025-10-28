@@ -16,9 +16,13 @@
       align-items: flex-start;
     }
     /* Each chart container */
-    .chart-box {
-      padding-right: 20px;
-    }
+    .chart-box p {
+  text-align: left;
+  font-size: 14px;
+  margin-top: 8px;
+  color: #333;
+}
+
     /* Add a vertical line separator on right side except last one */
     .chart-box:not(:last-child) {
       border-right: 3px solid #ccc;
@@ -30,10 +34,36 @@
   <h2>Traffic Accident Visualizations</h2>
 
   <div class="chart-row">
-    <div id="chart1" class="chart-box"></div>
-    <div id="chart2" class="chart-box"></div>
-    <div id="chart3" class="chart-box"></div>
+		<div class="chart-box">
+		    <div id="chart1"></div>
+	</div>
+	
+	
+    <div class="chart-box">
+		<div id="chart2"></div>
+		<br><br>
+
+		<h4>Description for Task2:</h4>
+
+		<p>
+		This combined line chart showcases the total number of accidents that occur at each hour of the day for each day throughout the week.  It displays the total number of accidents that occurred at each particular hour of the day using both line and point markers. The y-axis represents the overall number of accidents, while the x-axis indicates the hours (from 0 to 23, using the 24-hour system). Different colors are used to distinguish between each line, which represents a different day of the week.
+
+		The visualization shows a general trend: the number of accidents stays relatively low from 12 AM to around 6 AM, then rises dramatically between 7 AM and 5 PM before progressively declining once again from 6 PM to 11 PM. Among the days, Thursday and Tuesday have the biggest peaks, with totals ranging from 400 to 500 accidents, while Sunday has fewer incidents than other days of the week.
+
+		Additionally, the visualization has an interactive feature that shows the precise number of accidents when the user hovers over that exact point.</p>
+	</div>
+	
+    <div class="chart-box">
+	    <div id="chart3"></div>
+		<h4>Description for Task3:</h4>
+		<p>
+		The latitude and longitude values were rounded and grouped to aggregate nearby accidents (accidents occurring within approximately 300 meters of each other). This process was used to combine close accident points and avoid visual clutter, allowing the map to clearly highlight the density. The total number of accidents was then calculated using the count aggregation. The color channel was used to encode the accident density, where darker shades represent a higher number of accidents, and lighter shades indicate lower frequencies.
+		</p>
+</div>
   </div>
+  
+  
+
 
   <script>
     // === Chart 1: Bar Chart ===
@@ -74,7 +104,7 @@
         {"calculate": "timeFormat(datum.acci_time, '%A')", "as": "day_of_the_week"}
       ],
       "width": 700,
-      "height": 400,
+      "height": 500,
       "title": "Traffic Accidents by the Time of Day and Weekdays",
       "mark": {"type": "line", "point": {"filled": true, "size": 70}},
       "encoding": {
