@@ -73,7 +73,7 @@
         {"calculate": "hours(datum.acci_time)", "as": "hour"},
         {"calculate": "timeFormat(datum.acci_time, '%A')", "as": "day_of_the_week"}
       ],
-      "width": 400,
+      "width": 700,
       "height": 400,
       "title": "Traffic Accidents by the Time of Day and Weekdays",
       "mark": {"type": "line", "point": {"filled": true, "size": 70}},
@@ -137,9 +137,10 @@
         "format": {"type": "csv", "parse": {"acci_time": "date:'%d/%m/%Y %H:%M:%S'"}}
       },
       "title": "Accident Density Map Across Dubai",
-      "width": 400,
-      "height": 400,
-      "projection": {"type": "mercator"},
+      "width": 1000,
+	  "height": 600,
+	"autosize": {"type": "fit", "contains": "padding"},
+
       "layer": [
         {
           "data": {
